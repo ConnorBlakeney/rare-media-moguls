@@ -38,6 +38,7 @@ export const Comment = (props) => {
                 <button className="button--closeDialog btn" onClick={e => deleteCommentDialog.current.close()}>Close</button>
                 <button className="button--deleteDialog btn"
                     onClick={e => {
+                        e.preventDefault()
                         deleteComment(props.comment.id).then(deleteCommentDialog.current.close()).then(window.location.reload())
                         
                     }}>Delete</button>

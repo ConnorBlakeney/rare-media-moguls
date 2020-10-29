@@ -1,13 +1,14 @@
-import React, { useContext, useState } from "react"
+import React, { useContext, useState, useEffect } from "react"
 import { CommentContext } from "./CommentProvider"
 
 export const CommentForm = (props) => {
 
-    const { addComment } = useContext(CommentContext)
+    const { addComment, updateComment, comments } = useContext(CommentContext)
 
     const [comment, setComment] = useState({})
 
     const editMode = props.match.params.hasOwnProperty("postId")
+    console.log(props)
 
     const handleControlledInputChange = (eve) => {
         const newComment = Object.assign({}, comment)
@@ -18,18 +19,31 @@ export const CommentForm = (props) => {
     const constructNewComment = () => {
         const post_id = parseInt(props.match.params.postId)
         if(comment.subject && comment.content){
-            const newCommentObject = {
-                subject: comment.subject,
-                content: comment.content,
-                post_id,
-                user_id: parseInt(localStorage.getItem("rare_user_id")),
-                timestamp: Date.now()
-            }
-            addComment(newCommentObject)
-                .then(props.history.push(`/comments/${post_id}`))
-        }else{
-            window.alert("please fill in all fields")
-        } 
+            if(editMode) {
+              updateComment({
+                  id: comment.id,
+                  subject: comment.subject,
+                  content: comment.content,
+                  post_id,
+                  user_id: parseInt(localStorage.getItem("rare_user_id")),
+                  timestamp: Date.now()
+              }).then(() => {
+                  props.history.push(`/comments/${post_id}`)
+              })
+            } else{
+                const newCommentObject = {
+                    subject: comment.subject,
+                    content: comment.content,
+                    post_id,
+                    user_id: parseInt(localStorage.getItem("rare_user_id")),
+                    timestamp: Date.now()
+                }
+                addComment(newCommentObject)
+                    .then(props.history.push(`/comments/${post_id}`))
+            }}else{
+                window.alert("please fill in all fields")
+            } 
+
 
     }
     return (
@@ -41,7 +55,7 @@ export const CommentForm = (props) => {
                     <label htmlFor="subject">Subject: </label>
                     <input type="text" name="subject" required className="form-control" id="subject"
                         proptype="varchar"
-                        placeholder="subject"
+                        placeholder={editMode ? comment.subject : "subject"}
                         defaultValue={comment.subject}
                         onChange={handleControlledInputChange}>
                     </input>
@@ -52,7 +66,7 @@ export const CommentForm = (props) => {
                     <label htmlFor="content">Comment: </label>
                     <textarea type="text" name="content" required className="form-control" id="content"
                         proptype="varchar"
-                        placeholder="What are your thoughts?"
+                        placeholder={editMode ? comment.content : "What are your thoughts?"}
                         defaultValue={comment.content}
                         onChange={handleControlledInputChange}>
                     </textarea>
@@ -65,7 +79,7 @@ export const CommentForm = (props) => {
                         
                 }}
                 className="btn comment_submit_btn">
-                Save 
+                {editMode ? "Save Edit" : "Save Comment"} 
             </button>
             <button 
                 onClick={evt => {

@@ -41,7 +41,7 @@ export const CommentProvider = (props) => {
     }
 
     const updateComment = (comment_id, comment) => {
-        return fetch(`http://localhost:8000/tags/${comment_id}`, {
+        return fetch(`http://localhost:8000/comments/${comment_id}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json"
